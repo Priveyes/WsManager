@@ -21,8 +21,10 @@ import okio.ByteString;
 
 public class WsManager implements IWsManager {
 
-  private final static int RECONNECT_INTERVAL = 1 * 1000;    //重连自增步长
-  private final static long RECONNECT_MAX_TIME = 3 * 1000;   //最大重连间隔
+  // private final static int RECONNECT_INTERVAL = 1 * 1000;    //重连自增步长
+  // private final static long RECONNECT_MAX_TIME = 3 * 1000;   //最大重连间隔
+  private int reconnectInterval = 10 * 1000;
+  private long reconnectMaxTime = 120 * 1000;
   private Context mContext;
   private String wsUrl;
   private WebSocket mWebSocket;
@@ -188,6 +190,14 @@ public class WsManager implements IWsManager {
     this.wsStatusListener = wsStatusListener;
   }
 
+  public void setReconnectInterval(int ms) {
+    this.reconnectInterval = ms;
+  }
+
+  public void setReconnectMaxInterval(long ms) {
+    this.reconnectMaxTime = ms;
+  }
+
   @Override
   public synchronized boolean isWsConnected() {
     return mCurrentStatus == WsStatus.CONNECTED;
@@ -227,9 +237,9 @@ public class WsManager implements IWsManager {
 
     setCurrentStatus(WsStatus.RECONNECT);
 
-    long delay = reconnectCount * RECONNECT_INTERVAL;
+    long delay = reconnectCount * reconnectInterval;
     wsMainHandler
-        .postDelayed(reconnectRunnable, delay > RECONNECT_MAX_TIME ? RECONNECT_MAX_TIME : delay);
+        .postDelayed(reconnectRunnable, delay > reconnectMaxTime ? reconnectMaxTime : delay);
     reconnectCount++;
   }
 
