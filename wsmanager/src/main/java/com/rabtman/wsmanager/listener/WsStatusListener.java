@@ -4,7 +4,7 @@ import okhttp3.Response;
 import okio.ByteString;
 
 /**
- * @author rabtman 可用于监听ws连接状态并进一步拓展
+ * @author rabtman Can be used to monitor the ws connection status and further expand
  */
 public abstract class WsStatusListener {
 

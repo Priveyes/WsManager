@@ -1,14 +1,14 @@
 apply plugin: 'com.android.library'
-apply plugin: 'com.github.dcendents.android-maven'
-apply plugin: 'com.jfrog.bintray'
+//apply plugin: 'com.github.dcendents.android-maven'
+//apply plugin: 'com.jfrog.bintray'
 
 android {
-    compileSdkVersion 25
-    buildToolsVersion "25.0.0"
+    compileSdkVersion 28
+    buildToolsVersion "28.0.3"
 
     defaultConfig {
         minSdkVersion 14
-        targetSdkVersion 25
+        targetSdkVersion 28
         versionCode 3
         versionName "1.0.2"
     }
@@ -21,13 +21,18 @@ android {
     lintOptions {
         abortOnError false
     }
+
+    compileOptions {
+        sourceCompatibility = '1.8'
+        targetCompatibility = '1.8'
+    }
 }
 
 dependencies {
-    compile fileTree(include: ['*.jar'], dir: 'libs')
-    compile 'com.squareup.okhttp3:okhttp:3.8.1'
+//    implementation fileTree(include: ['*.jar'], dir: 'libs')
+    implementation 'com.squareup.okhttp3:okhttp:3.13.1'
 }
-
+/*
 Properties properties = new Properties()
 File localPropertiesFile = project.rootProject.file("local.properties");
 if (localPropertiesFile.exists()) {
@@ -37,8 +42,9 @@ File projectPropertiesFile = project.file("project.properties");
 if (projectPropertiesFile.exists()) {
     properties.load(projectPropertiesFile.newDataInputStream())
 }
-
-//读取属性
+*/
+/*
+//Read attribute
 def projectRepositoryName = properties.getProperty("project.repositoryName")
 def projectName = properties.getProperty("project.name")
 def projectGroupId = properties.getProperty("project.groupId")
@@ -59,7 +65,8 @@ def javadocName = properties.getProperty("javadoc.name")
 
 group = projectGroupId
 version = projectVersionName
-
+*/
+/*
 task generateSourcesJar(type: Jar) {
     from android.sourceSets.main.java.srcDirs
     classifier 'sources'
@@ -89,8 +96,9 @@ artifacts {
     archives generateJavadocsJar
     archives generateSourcesJar
 }
-
-// 配置生成POM.xml文件的参数
+*/
+/*
+// Configure the parameters for generating the POM.xml file.
 install {
     repositories.mavenInstaller {
         pom {
@@ -123,7 +131,8 @@ install {
         }
     }
 }
-
+*/
+/*
 bintray {
     user = bintrayUser
     key = bintrayApikey
@@ -143,7 +152,7 @@ bintray {
     }
     configurations = ['archives']
 }
-
+*/
 /*task makeJar(type: Copy) {
     delete 'build/libs/WsManager.jar'
     from('build/intermediates/bundles/release/')
@@ -152,5 +161,5 @@ bintray {
     rename('classes.jar', 'WsManager.jar')
 }
 makeJar.dependsOn(build)*/
-//在终端执行生成JAR包
+//Generate a JAR package at the terminal
 // gradlew makeJar

@@ -1,13 +1,14 @@
 package com.rabtman.wsdemo;
 
-import android.content.Context;
-import android.support.test.InstrumentationRegistry;
-import android.support.test.runner.AndroidJUnit4;
+import android.content.*;
 
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import androidx.test.*;
+import androidx.test.runner.*;
 
-import static org.junit.Assert.assertEquals;
+import org.junit.*;
+import org.junit.runner.*;
+
+import static junit.framework.TestCase.assertEquals;
 
 /**
  * Instrumentation test, which will execute on an Android device.
@@ -16,11 +17,11 @@ import static org.junit.Assert.assertEquals;
  */
 @RunWith(AndroidJUnit4.class)
 public class ExampleInstrumentedTest {
-    @Test
-    public void useAppContext() throws Exception {
-        // Context of the app under test.
-        Context appContext = InstrumentationRegistry.getTargetContext();
+	@Test
+	public void useAppContext() throws Exception {
+		// Context of the app under test.
+		Context appContext = InstrumentationRegistry.getTargetContext();
 
-        assertEquals("com.rabtman.wsdemo", appContext.getPackageName());
-    }
+		assertEquals("com.rabtman.wsdemo", appContext.getPackageName());
+	}
 }

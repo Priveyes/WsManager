@@ -21,20 +21,20 @@ import okio.ByteString;
 
 public class WsManager implements IWsManager {
 
-  private final static int RECONNECT_INTERVAL = 1 * 1000;    //重连自增步长
-  private final static long RECONNECT_MAX_TIME = 3 * 1000;   //最大重连间隔
+  private final static int RECONNECT_INTERVAL = 1 * 1000;    //Reconnection step
+  private final static long RECONNECT_MAX_TIME = 3 * 1000;   //Maximum reconnection interval
   private Context mContext;
   private String wsUrl;
   private WebSocket mWebSocket;
   private OkHttpClient mOkHttpClient;
   private Request mRequest;
-  private int mCurrentStatus = WsStatus.DISCONNECTED;     //websocket连接状态
-  private boolean isNeedReconnect;          //是否需要断线自动重连
-  private boolean isManualClose = false;         //是否为手动关闭websocket连接
+  private int mCurrentStatus = WsStatus.DISCONNECTED;     //Websocket connection status
+  private boolean isNeedReconnect;          //Do you need to disconnect automatically?
+  private boolean isManualClose = false;         //Whether to manually close the websocket connection
   private WsStatusListener wsStatusListener;
   private Lock mLock;
   private Handler wsMainHandler = new Handler(Looper.getMainLooper());
-  private int reconnectCount = 0;   //重连次数
+  private int reconnectCount = 0;   //Number of reconnections
   private Runnable reconnectRunnable = new Runnable() {
     @Override
     public void run() {
@@ -53,12 +53,7 @@ public class WsManager implements IWsManager {
       connected();
       if (wsStatusListener != null) {
         if (Looper.myLooper() != Looper.getMainLooper()) {
-          wsMainHandler.post(new Runnable() {
-            @Override
-            public void run() {
-              wsStatusListener.onOpen(response);
-            }
-          });
+          wsMainHandler.post(() -> wsStatusListener.onOpen(response));
         } else {
           wsStatusListener.onOpen(response);
         }
@@ -69,12 +64,7 @@ public class WsManager implements IWsManager {
     public void onMessage(WebSocket webSocket, final ByteString bytes) {
       if (wsStatusListener != null) {
         if (Looper.myLooper() != Looper.getMainLooper()) {
-          wsMainHandler.post(new Runnable() {
-            @Override
-            public void run() {
-              wsStatusListener.onMessage(bytes);
-            }
-          });
+          wsMainHandler.post(() -> wsStatusListener.onMessage(bytes));
         } else {
           wsStatusListener.onMessage(bytes);
         }
@@ -85,12 +75,7 @@ public class WsManager implements IWsManager {
     public void onMessage(WebSocket webSocket, final String text) {
       if (wsStatusListener != null) {
         if (Looper.myLooper() != Looper.getMainLooper()) {
-          wsMainHandler.post(new Runnable() {
-            @Override
-            public void run() {
-              wsStatusListener.onMessage(text);
-            }
-          });
+          wsMainHandler.post(() -> wsStatusListener.onMessage(text));
         } else {
           wsStatusListener.onMessage(text);
         }
@@ -101,12 +86,7 @@ public class WsManager implements IWsManager {
     public void onClosing(WebSocket webSocket, final int code, final String reason) {
       if (wsStatusListener != null) {
         if (Looper.myLooper() != Looper.getMainLooper()) {
-          wsMainHandler.post(new Runnable() {
-            @Override
-            public void run() {
-              wsStatusListener.onClosing(code, reason);
-            }
-          });
+          wsMainHandler.post(() -> wsStatusListener.onClosing(code, reason));
         } else {
           wsStatusListener.onClosing(code, reason);
         }
@@ -117,12 +97,7 @@ public class WsManager implements IWsManager {
     public void onClosed(WebSocket webSocket, final int code, final String reason) {
       if (wsStatusListener != null) {
         if (Looper.myLooper() != Looper.getMainLooper()) {
-          wsMainHandler.post(new Runnable() {
-            @Override
-            public void run() {
-              wsStatusListener.onClosed(code, reason);
-            }
-          });
+          wsMainHandler.post(() -> wsStatusListener.onClosed(code, reason));
         } else {
           wsStatusListener.onClosed(code, reason);
         }
@@ -134,12 +109,7 @@ public class WsManager implements IWsManager {
       tryReconnect();
       if (wsStatusListener != null) {
         if (Looper.myLooper() != Looper.getMainLooper()) {
-          wsMainHandler.post(new Runnable() {
-            @Override
-            public void run() {
-              wsStatusListener.onFailure(t, response);
-            }
-          });
+          wsMainHandler.post(() -> wsStatusListener.onFailure(t, response));
         } else {
           wsStatusListener.onFailure(t, response);
         }
@@ -174,7 +144,7 @@ public class WsManager implements IWsManager {
       } finally {
         mLock.unlock();
       }
-    } catch (InterruptedException e) {
+    } catch (InterruptedException ignored) {
     }
   }
 
@@ -252,7 +222,7 @@ public class WsManager implements IWsManager {
     }
     if (mWebSocket != null) {
       boolean isClosed = mWebSocket.close(WsStatus.CODE.NORMAL_CLOSE, WsStatus.TIP.NORMAL_CLOSE);
-      //非正常关闭连接
+      //Abnormally close the connection
       if (!isClosed) {
         if (wsStatusListener != null) {
           wsStatusListener.onClosed(WsStatus.CODE.ABNORMAL_CLOSE, WsStatus.TIP.ABNORMAL_CLOSE);
@@ -277,7 +247,7 @@ public class WsManager implements IWsManager {
     }
   }
 
-  //发送消息
+  //Send a message
   @Override
   public boolean sendMessage(String msg) {
     return send(msg);
@@ -296,7 +266,7 @@ public class WsManager implements IWsManager {
       } else if (msg instanceof ByteString) {
         isSend = mWebSocket.send((ByteString) msg);
       }
-      //发送消息失败，尝试重连
+      //Failed to send message, try to reconnect
       if (!isSend) {
         tryReconnect();
       }
@@ -304,13 +274,12 @@ public class WsManager implements IWsManager {
     return isSend;
   }
 
-  //检查网络是否连接
+  //Check if the network is connected
   private boolean isNetworkConnected(Context context) {
     if (context != null) {
       ConnectivityManager mConnectivityManager = (ConnectivityManager) context
           .getSystemService(Context.CONNECTIVITY_SERVICE);
-      NetworkInfo mNetworkInfo = mConnectivityManager
-          .getActiveNetworkInfo();
+      NetworkInfo mNetworkInfo = mConnectivityManager.getActiveNetworkInfo();
       if (mNetworkInfo != null) {
         return mNetworkInfo.isAvailable();
       }

@@ -16,7 +16,7 @@ public class TestOkHttpWebSocket {
 
     private static final MockWebServer mockWebServer = new MockWebServer();
     private static WebSocket mWebSocket = null;
-    private static int msgCount = 0; //消息发送次数
+    private static int msgCount = 0; //Number of times the message was sent
     private static Timer mTimer;
 
     public static void main(String[] args) {
@@ -26,7 +26,7 @@ public class TestOkHttpWebSocket {
         initWsClient("ws://" + mockWebServer.getHostName() + ":" + mockWebServer.getPort() + "/");
     }
 
-    //每秒发送一条消息
+    //Send a message every second
     private static void startTask() {
         mTimer = new Timer();
         TimerTask timerTask = new TimerTask() {
@@ -114,7 +114,7 @@ public class TestOkHttpWebSocket {
             public void onMessage(WebSocket webSocket, String string) {
                 System.out.println("server onMessage");
                 System.out.println("message:" + string);
-                //接受到5条信息后，关闭消息定时发送器
+                //After receiving 5 messages, close the message timing sender
                 if (msgCount == 5) {
                     mTimer.cancel();
                     webSocket.close(1000, "close by server");
@@ -131,7 +131,7 @@ public class TestOkHttpWebSocket {
 
             @Override
             public void onClosed(WebSocket webSocket, int code, String reason) {
-                //打印一些内容
+                //Print some content
                 System.out.println("server onClosed");
                 System.out.println("code:" + code + " reason:" + reason);
             }
